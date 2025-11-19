@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'ZenSerif'; /* ⬅️ 4단계에서 쓸, 우리가 지어준 이름 */
+  font-weight: 400; /* 폰트 굵기 (Regular = 400) */
+  src: url('./assets/fonts/ZEN-SERIF-Regular.woff2') format('woff2'); /* ⬅️ 방금 넣은 파일 경로 */
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
