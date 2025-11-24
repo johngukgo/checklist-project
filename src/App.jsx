@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Home, FileCheck, Download, Wind, Refrigerator, Shirt, Flame, Microwave, Bed, BookOpen, SquareStack, Shield, AlertCircle, Calculator } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Home, FileCheck, Download, Wind, Refrigerator, Shirt, Flame, Microwave, Bed, BookOpen, SquareStack, Shield, AlertCircle, Calculator, Share2 } from 'lucide-react';
 
 const RentalChecklist = () => {
   const [showLanding, setShowLanding] = useState(true);
@@ -315,8 +315,111 @@ const RentalChecklist = () => {
     });
   };
 
+  // 모바일 감지
+  const isMobile = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  };
+
+  // PDF 생성 함수 (html2canvas + jsPDF)
+  const generatePDF = async () => {
+    try {
+      // 동적으로 스크립트 로드
+      const loadScript = (src) => {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      };
+
+      // html2canvas와 jsPDF 로드 (아직 로드되지 않았다면)
+      if (typeof window.html2canvas === 'undefined') {
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+      }
+      if (typeof window.jspdf === 'undefined') {
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+      }
+
+      const element = document.querySelector('.pdf-content');
+      if (!element) return;
+
+      // 캔버스로 변환
+      const canvas = await window.html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      // PDF 생성
+      const imgData = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pageHeight = 297; // A4 height in mm
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // 첫 페이지
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // 추가 페이지
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // PDF 저장
+      pdf.save('임대차계약_체크리스트.pdf');
+    } catch (error) {
+      console.error('PDF 생성 중 오류:', error);
+      alert('PDF 생성에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  // PDF 저장 핸들러
   const handlePrint = () => {
-    window.print();
+    if (isMobile()) {
+      generatePDF();
+    } else {
+      window.print();
+    }
+  };
+
+  // 공유하기 함수
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '임대차 계약 체크리스트',
+          text: '내 임대차 계약 조건을 정리했어요!',
+          url: window.location.href
+        });
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('공유 중 오류:', error);
+        }
+      }
+    } else {
+      // Web Share API 미지원 시 클립보드 복사
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('링크가 클립보드에 복사되었습니다!');
+      } catch (error) {
+        alert('공유 기능을 지원하지 않는 브라우저입니다.');
+      }
+    }
   };
 
   const generateSpecialTerms = () => {
@@ -732,8 +835,16 @@ const RentalChecklist = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <FileCheck className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+                {/* 데스크톱 */}
+                <h2 className="hidden md:block text-2xl font-bold text-gray-800">
                   임대차계약 체크리스트와<br />맞춤특약 만들기
+                </h2>
+                {/* 모바일 */}
+                <h2 className="block md:hidden text-lg font-bold text-gray-800 leading-relaxed">
+                  임대차계약<br />
+                  체크리스트와<br />
+                  맞춤특약<br />
+                  만들기
                 </h2>
               </div>
             </button>
@@ -750,8 +861,15 @@ const RentalChecklist = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <Calculator className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+                {/* 데스크톱 */}
+                <h2 className="hidden md:block text-2xl font-bold text-gray-800">
                   임대차계약<br />비용 계산하기
+                </h2>
+                {/* 모바일 */}
+                <h2 className="block md:hidden text-lg font-bold text-gray-800 leading-relaxed">
+                  임대차계약<br />
+                  비용<br />
+                  계산하기
                 </h2>
               </div>
             </button>
@@ -822,7 +940,7 @@ const RentalChecklist = () => {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-        <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 print:shadow-none">
+        <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 print:shadow-none pdf-content">
           {/* 홈 버튼 (인쇄 시 숨김) */}
           <button
             onClick={() => {
@@ -1048,13 +1166,20 @@ const RentalChecklist = () => {
             </div>
           )}
 
-          <div className="mt-6 flex gap-3 print:hidden">
+          <div className="mt-6 flex flex-col sm:flex-row gap-3 print:hidden">
             <button
               onClick={handlePrint}
               className="flex-1 bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-2"
             >
               <Download className="w-5 h-5" />
               PDF 저장하기
+            </button>
+            <button
+              onClick={handleShare}
+              className="flex-1 bg-green-600 text-white py-2.5 rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2"
+            >
+              <Share2 className="w-5 h-5" />
+              공유하기
             </button>
             <button
               onClick={handleReset}
