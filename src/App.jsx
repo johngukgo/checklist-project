@@ -732,7 +732,7 @@ const RentalChecklist = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <FileCheck className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800">
                   임대차계약 체크리스트와<br />맞춤특약 만들기
                 </h2>
               </div>
@@ -750,7 +750,7 @@ const RentalChecklist = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <Calculator className="w-8 h-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800">
                   임대차계약<br />비용 계산하기
                 </h2>
               </div>
@@ -1033,7 +1033,7 @@ const RentalChecklist = () => {
 
           {/* 최종 특약 목록 */}
           {specialTerms.length > 0 && (
-            <div className="mb-6">
+            <div className="mb-6 print:break-before-page">
               <h2 className="text-lg font-bold text-gray-800 mb-3 pb-2 border-b-2 border-red-500">
                 ⚠️ 계약서에 포함할 특약 사항
               </h2>
@@ -1054,7 +1054,7 @@ const RentalChecklist = () => {
               className="flex-1 bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-2"
             >
               <Download className="w-5 h-5" />
-              인쇄 / PDF 저장
+              PDF 저장하기
             </button>
             <button
               onClick={handleReset}
@@ -1349,14 +1349,12 @@ const RentalChecklist = () => {
                     onClick={() => {
                       const current = answers[currentQuestion.id] || [];
                       const option = '고층 선호';
-                      if (current.includes('무관')) {
-                        handleAnswer([option]);
-                      } else {
-                        const updated = current.includes(option)
-                          ? current.filter(item => item !== option)
-                          : [...current, option];
-                        handleAnswer(updated);
-                      }
+                      // 무관 제거 후 해당 옵션 토글
+                      const withoutFloorPreference = current.filter(item => item !== '무관');
+                      const updated = withoutFloorPreference.includes(option)
+                        ? withoutFloorPreference.filter(item => item !== option)
+                        : [...withoutFloorPreference, option];
+                      handleAnswer(updated);
                     }}
                     className={`w-40 h-24 rounded-t-lg border-2 transition flex items-center justify-center ${
                       (answers[currentQuestion.id] || []).includes('고층 선호')
@@ -1375,14 +1373,12 @@ const RentalChecklist = () => {
                     onClick={() => {
                       const current = answers[currentQuestion.id] || [];
                       const option = '중층 선호';
-                      if (current.includes('무관')) {
-                        handleAnswer([option]);
-                      } else {
-                        const updated = current.includes(option)
-                          ? current.filter(item => item !== option)
-                          : [...current, option];
-                        handleAnswer(updated);
-                      }
+                      // 무관 제거 후 해당 옵션 토글
+                      const withoutFloorPreference = current.filter(item => item !== '무관');
+                      const updated = withoutFloorPreference.includes(option)
+                        ? withoutFloorPreference.filter(item => item !== option)
+                        : [...withoutFloorPreference, option];
+                      handleAnswer(updated);
                     }}
                     className={`w-40 h-24 border-2 border-t-0 transition flex items-center justify-center ${
                       (answers[currentQuestion.id] || []).includes('중층 선호')
@@ -1401,14 +1397,12 @@ const RentalChecklist = () => {
                     onClick={() => {
                       const current = answers[currentQuestion.id] || [];
                       const option = '저층 선호';
-                      if (current.includes('무관')) {
-                        handleAnswer([option]);
-                      } else {
-                        const updated = current.includes(option)
-                          ? current.filter(item => item !== option)
-                          : [...current, option];
-                        handleAnswer(updated);
-                      }
+                      // 무관 제거 후 해당 옵션 토글
+                      const withoutFloorPreference = current.filter(item => item !== '무관');
+                      const updated = withoutFloorPreference.includes(option)
+                        ? withoutFloorPreference.filter(item => item !== option)
+                        : [...withoutFloorPreference, option];
+                      handleAnswer(updated);
                     }}
                     className={`w-40 h-24 border-2 border-t-0 transition flex items-center justify-center ${
                       (answers[currentQuestion.id] || []).includes('저층 선호')
@@ -1430,14 +1424,11 @@ const RentalChecklist = () => {
                   onClick={() => {
                     const current = answers[currentQuestion.id] || [];
                     const option = '엘리베이터 필수';
-                    if (current.includes('무관')) {
-                      handleAnswer([option]);
-                    } else {
-                      const updated = current.includes(option)
-                        ? current.filter(item => item !== option)
-                        : [...current, option];
-                      handleAnswer(updated);
-                    }
+                    // 엘리베이터는 독립적으로 토글 (무관 여부와 상관없이)
+                    const updated = current.includes(option)
+                      ? current.filter(item => item !== option)
+                      : [...current, option];
+                    handleAnswer(updated);
                   }}
                   className={`w-full max-w-md p-4 rounded-lg border-2 transition ${
                     (answers[currentQuestion.id] || []).includes('엘리베이터 필수')
@@ -1450,7 +1441,17 @@ const RentalChecklist = () => {
 
                 <button
                   onClick={() => {
-                    handleAnswer(['무관']);
+                    const current = answers[currentQuestion.id] || [];
+                    const option = '무관';
+                    // 무관 토글: 저층/중층/고층만 제거, 엘리베이터는 유지
+                    if (current.includes(option)) {
+                      // 무관 해제
+                      handleAnswer(current.filter(item => item !== option));
+                    } else {
+                      // 무관 선택: 층수 선택 제거하고 무관 추가, 엘리베이터는 유지
+                      const elevatorOnly = current.filter(item => item === '엘리베이터 필수');
+                      handleAnswer([...elevatorOnly, option]);
+                    }
                   }}
                   className={`w-full max-w-md p-4 rounded-lg border-2 transition ${
                     (answers[currentQuestion.id] || []).includes('무관')
