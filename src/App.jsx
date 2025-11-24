@@ -108,6 +108,38 @@ const RentalChecklist = () => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
+  // 만원 단위를 읽기 쉬운 텍스트로 변환
+  const formatWonText = (manwon) => {
+    if (!manwon) return '';
+    const num = parseFloat(manwon.replace(/,/g, ''));
+    if (isNaN(num) || num === 0) return '';
+
+    const eok = Math.floor(num / 10000); // 억
+    const remainder = num % 10000;
+    const cheonman = Math.floor(remainder / 1000); // 천만
+    const baekman = Math.floor((remainder % 1000) / 100); // 백만
+    const man = remainder % 100; // 만
+
+    let result = '';
+    
+    if (eok > 0) {
+      result += `${eok}억`;
+      if (cheonman > 0) result += ` ${cheonman}천`;
+      if (baekman > 0 && cheonman === 0) result += ` ${baekman}백`;
+      result += '원';
+    } else if (cheonman > 0) {
+      result += `${cheonman}천`;
+      if (baekman > 0) result += `${baekman}백`;
+      result += '만원';
+    } else if (baekman > 0) {
+      result += `${baekman}백만원`;
+    } else {
+      result += `${man}만원`;
+    }
+
+    return result;
+  };
+
   const questions = [
     // 계약 조건 섹션
     {
@@ -519,17 +551,24 @@ const RentalChecklist = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   보증금 (만원)
                 </label>
-                <input
-                  type="text"
-                  placeholder="예: 10,000 (1억원)"
-                  value={costData.deposit}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9]/g, '');
-                    const formatted = value ? formatNumber(value) : '';
-                    setCostData({ ...costData, deposit: formatted, showBrokerageFee: false });
-                  }}
-                  className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-indigo-600 focus:outline-none"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="예: 10,000 (1억원)"
+                    value={costData.deposit}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '');
+                      const formatted = value ? formatNumber(value) : '';
+                      setCostData({ ...costData, deposit: formatted, showBrokerageFee: false });
+                    }}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-indigo-600 focus:outline-none"
+                  />
+                  {costData.deposit && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">
+                      {formatWonText(costData.deposit)}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* 월세 입력 (선택) */}
@@ -537,17 +576,24 @@ const RentalChecklist = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   월세 (만원) - 선택사항
                 </label>
-                <input
-                  type="text"
-                  placeholder="예: 50 (50만원)"
-                  value={costData.monthlyRent}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9]/g, '');
-                    const formatted = value ? formatNumber(value) : '';
-                    setCostData({ ...costData, monthlyRent: formatted, showBrokerageFee: false });
-                  }}
-                  className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-indigo-600 focus:outline-none"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="예: 50 (50만원)"
+                    value={costData.monthlyRent}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '');
+                      const formatted = value ? formatNumber(value) : '';
+                      setCostData({ ...costData, monthlyRent: formatted, showBrokerageFee: false });
+                    }}
+                    className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-indigo-600 focus:outline-none"
+                  />
+                  {costData.monthlyRent && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">
+                      {formatWonText(costData.monthlyRent)}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* 중개수수료 계산 버튼 */}
@@ -669,17 +715,24 @@ const RentalChecklist = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         대출 금액 (만원)
                       </label>
-                      <input
-                        type="text"
-                        placeholder="예: 5,000 (5천만원)"
-                        value={costData.loanAmount}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/[^0-9]/g, '');
-                          const formatted = value ? formatNumber(value) : '';
-                          setCostData({ ...costData, loanAmount: formatted });
-                        }}
-                        className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-indigo-600 focus:outline-none"
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="예: 5,000 (5천만원)"
+                          value={costData.loanAmount}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '');
+                            const formatted = value ? formatNumber(value) : '';
+                            setCostData({ ...costData, loanAmount: formatted });
+                          }}
+                          className="w-full p-3 rounded-lg border-2 border-gray-200 focus:border-indigo-600 focus:outline-none"
+                        />
+                        {costData.loanAmount && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">
+                            {formatWonText(costData.loanAmount)}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     {costData.loanAmount && monthlyInterest > 0 && (
                       <div className="p-3 bg-amber-50 rounded-lg border border-amber-300">
@@ -746,23 +799,38 @@ const RentalChecklist = () => {
             {/* 총 비용 요약 */}
             <div className="p-6 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl border-2 border-indigo-300">
               <h2 className="text-xl font-bold text-gray-800 mb-4">💡 예상 비용 요약</h2>
+              
+              {/* 보증금/월세 영역 - 강조 박스 */}
+              {(costData.deposit || costData.monthlyRent) && (
+                <div className="mb-4 p-4 bg-white rounded-lg border-2 border-indigo-400 shadow-sm">
+                  <div className="space-y-2">
+                    {costData.deposit && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-base font-bold text-gray-800">보증금:</span>
+                        <span className="text-lg font-bold text-indigo-600">
+                          {formatNumber(parseFloat(costData.deposit.replace(/,/g, '')) * 10000)}원
+                        </span>
+                      </div>
+                    )}
+                    {costData.monthlyRent && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-base font-bold text-gray-800">월세:</span>
+                        <span className="text-lg font-bold text-indigo-600">
+                          {formatNumber(parseFloat(costData.monthlyRent.replace(/,/g, '')) * 10000)}원
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 구분선 */}
+              {(costData.deposit || costData.monthlyRent) && (brokerageFee || movingCost || cleaningCost || monthlyInterest > 0 || insuranceFee > 0) && (
+                <div className="border-t-2 border-gray-300 my-4"></div>
+              )}
+
+              {/* 나머지 비용들 */}
               <div className="space-y-2">
-                {costData.deposit && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-700">보증금:</span>
-                    <span className="font-semibold text-gray-800">
-                      {formatNumber(parseFloat(costData.deposit.replace(/,/g, '')) * 10000)}원
-                    </span>
-                  </div>
-                )}
-                {costData.monthlyRent && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-700">월세:</span>
-                    <span className="font-semibold text-gray-800">
-                      {formatNumber(parseFloat(costData.monthlyRent.replace(/,/g, '')) * 10000)}원
-                    </span>
-                  </div>
-                )}
                 {brokerageFee && costData.showBrokerageFee && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-700">중개수수료:</span>
