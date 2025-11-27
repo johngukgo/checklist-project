@@ -885,12 +885,12 @@ const RentalChecklist = () => {
             {/* 로고 영역 */}
             <div className="inline-flex items-center justify-center">
               <img 
-                src="data:image/png;base64,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" 
+                src="https://i.imgur.com/XgPDSCM.png" 
                 alt="부동산가기전에 로고"
-                  className="h-32 object-contain"
-                />
-              </div>
+                className="h-32 object-contain"
+              />
             </div>
+          </div>
           
           {/* 하단 기능 버튼들 - 항상 수평 배치 */}
           <div className="grid grid-cols-2 gap-6">
@@ -900,8 +900,12 @@ const RentalChecklist = () => {
               className="group bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-indigo-500"
             >
               <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <FileCheck className="w-8 h-8 text-white" />
+                <div className="w-20 h-20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <img 
+                    src="https://i.imgur.com/5ob0aSD.png" 
+                    alt="체크리스트 아이콘"
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 {/* 데스크톱 */}
                 <h2 className="hidden md:block text-2xl font-bold text-gray-800">
@@ -926,8 +930,12 @@ const RentalChecklist = () => {
               className="group bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-green-500"
             >
               <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Calculator className="w-8 h-8 text-white" />
+                <div className="w-20 h-20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <img 
+                    src="https://i.imgur.com/g56IkAV.png" 
+                    alt="비용 계산기 아이콘"
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 {/* 데스크톱 */}
                 <h2 className="hidden md:block text-2xl font-bold text-gray-800">
@@ -1871,8 +1879,6 @@ const RentalChecklist = () => {
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-300">
                 <p className="text-sm text-gray-700 leading-relaxed">
                   💡 임차인은 주택임대차보호법에 따라 2년 미만으로 계약했더라도 2년의 계약 기간을 주장할 수 있어요. 
-                  임차인은 계약 기간이 1년인 경우에도 2년 동안 거주할 권리가 있으며, 필요한 경우 1년 만에 계약을 해지하고 보증금 반환을 요구할 수도 있어요. 
-                  이와 반대로 임대인은 2년 미만의 계약 기간을 주장할 수 없어요.
                 </p>
               </div>
             )}
