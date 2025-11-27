@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Home, FileCheck, Download, Wind, Refrigerator, Shirt, Flame, Microwave, Bed, BookOpen, SquareStack, Shield, AlertCircle, Calculator, Share2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Home, FileCheck, Download, Wind, Refrigerator, Shirt, Flame, Microwave, Bed, BookOpen, SquareStack, Shield, AlertCircle, Calculator } from 'lucide-react';
 
 const RentalChecklist = () => {
   const [showLanding, setShowLanding] = useState(true);
@@ -352,7 +352,69 @@ const RentalChecklist = () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   };
 
-  // PDF 생성 함수 (html2canvas + jsPDF)
+  // 이미지로 저장 (모바일용 - 2장)
+  const saveAsImages = async () => {
+    try {
+      // 동적으로 스크립트 로드
+      const loadScript = (src) => {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      };
+
+      // html2canvas 로드
+      if (typeof window.html2canvas === 'undefined') {
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+      }
+
+      // 1장: 계약 조건 테이블 영역
+      const tablesElement = document.querySelector('.checklist-tables');
+      if (tablesElement) {
+        const canvas1 = await window.html2canvas(tablesElement, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+        
+        // 첫 번째 이미지 다운로드
+        const link1 = document.createElement('a');
+        link1.download = '임대차계약_체크리스트_1.png';
+        link1.href = canvas1.toDataURL('image/png');
+        link1.click();
+        
+        // 잠시 대기
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      // 2장: 특약 사항 영역
+      const termsElement = document.querySelector('.special-terms-section');
+      if (termsElement) {
+        const canvas2 = await window.html2canvas(termsElement, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+        
+        // 두 번째 이미지 다운로드
+        const link2 = document.createElement('a');
+        link2.download = '임대차계약_특약사항_2.png';
+        link2.href = canvas2.toDataURL('image/png');
+        link2.click();
+      }
+      
+    } catch (error) {
+      console.error('이미지 저장 중 오류:', error);
+      alert('이미지 저장에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  // PDF 생성 함수 (PC용)
   const generatePDF = async () => {
     try {
       // 동적으로 스크립트 로드
@@ -420,37 +482,12 @@ const RentalChecklist = () => {
     }
   };
 
-  // PDF 저장 핸들러
-  const handlePrint = () => {
+  // 저장 핸들러
+  const handleSave = () => {
     if (isMobile()) {
-      generatePDF();
+      saveAsImages();
     } else {
       window.print();
-    }
-  };
-
-  // 공유하기 함수
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: '임대차 계약 체크리스트',
-          text: '내 임대차 계약 조건을 정리했어요!',
-          url: window.location.href
-        });
-      } catch (error) {
-        if (error.name !== 'AbortError') {
-          console.error('공유 중 오류:', error);
-        }
-      }
-    } else {
-      // Web Share API 미지원 시 클립보드 복사
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        alert('링크가 클립보드에 복사되었습니다!');
-      } catch (error) {
-        alert('공유 기능을 지원하지 않는 브라우저입니다.');
-      }
     }
   };
 
@@ -1048,7 +1085,7 @@ const RentalChecklist = () => {
           </div>
 
           {/* 계약 조건과 선택 조건을 가로로 배치 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 print:grid-cols-2 print:gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 print:grid-cols-2 print:gap-3 checklist-tables">
             {/* 계약 조건 */}
             <div>
               <h2 className="text-lg font-bold text-gray-800 mb-3 pb-2 border-b-2 border-indigo-600">
@@ -1227,7 +1264,7 @@ const RentalChecklist = () => {
 
           {/* 최종 특약 목록 */}
           {specialTerms.length > 0 && (
-            <div className="mb-6 print:break-before-page">
+            <div className="mb-6 print:break-before-page special-terms-section">
               <h2 className="text-lg font-bold text-gray-800 mb-3 pb-2 border-b-2 border-red-500">
                 ⚠️ 계약서에 포함할 특약 사항
               </h2>
@@ -1244,18 +1281,11 @@ const RentalChecklist = () => {
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3 print:hidden">
             <button
-              onClick={handlePrint}
+              onClick={handleSave}
               className="flex-1 bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-2"
             >
               <Download className="w-5 h-5" />
-              PDF 저장하기
-            </button>
-            <button
-              onClick={handleShare}
-              className="flex-1 bg-green-600 text-white py-2.5 rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2"
-            >
-              <Share2 className="w-5 h-5" />
-              공유하기
+              {isMobile() ? '이미지 저장하기' : 'PDF 저장하기'}
             </button>
             <button
               onClick={handleReset}
