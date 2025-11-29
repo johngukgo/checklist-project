@@ -70,9 +70,9 @@ const RentalChecklist = () => {
   // 이사비용 범위
   const getMovingCost = (size) => {
     const costs = {
-      '원룸': { min: 150000, max: 300000 },
-      '투룸': { min: 300000, max: 500000 },
-      '쓰리룸 이상': { min: 500000, max: 800000 }
+      '원룸': { min: 400000, max: 600000 },
+      '투룸': { min: 800000, max: 1000000 },
+      '쓰리룸 이상': { min: 1700000, max: 2500000 }
     };
     return costs[size] || null;
   };
@@ -80,9 +80,9 @@ const RentalChecklist = () => {
   // 입주청소비용 범위
   const getCleaningCost = (size) => {
     const costs = {
-      '원룸': { min: 80000, max: 150000 },
-      '투룸': { min: 120000, max: 200000 },
-      '쓰리룸 이상': { min: 180000, max: 300000 }
+      '원룸': { min: 150000, max: 250000 },
+      '투룸': { min: 250000, max: 300000 },
+      '쓰리룸 이상': { min: 300000, max: 450000 }
     };
     return costs[size] || null;
   };
@@ -705,6 +705,9 @@ const RentalChecklist = () => {
                     {formatNumber(movingCost.min)}원 ~ {formatNumber(movingCost.max)}원
                   </p>
                   <p className="text-xs text-gray-600 mt-1">
+                    * 포장이사 기준가격입니다
+                  </p>
+                  <p className="text-xs text-gray-600">
                     * 층수, 엘리베이터 유무, 거리에 따라 달라질 수 있습니다
                   </p>
                 </div>
@@ -1521,6 +1524,17 @@ const RentalChecklist = () => {
                     </button>
                   );
                 })}
+              </div>
+            )}
+
+            {/* 단독/다가구 선택 시 안내문구 */}
+            {currentQuestion.id === 'propertyType' && answers[currentQuestion.id] && 
+             Array.isArray(answers[currentQuestion.id]) && 
+             answers[currentQuestion.id].includes('단독/다가구') && (
+              <div className="p-4 bg-amber-50 rounded-lg border border-amber-300">
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  💡 단독·다가구주택은 근저당 외에 기존 세입자의 보증금을 등기부로 확인할 수 없으므로, 계약 전 반드시 선순위 보증금을 확인해야 합니다.
+                </p>
               </div>
             )}
 
