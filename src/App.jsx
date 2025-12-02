@@ -184,10 +184,15 @@ const RentalChecklist = () => {
     },
     {
       id: 'managementFee',
-      question: '예상 관리비는 어느 정도인가요?',
-      description: '아파트나 오피스텔은 평균 10~20만원 정도의 관리비가 나오고, 빌라나 다가구주택은 10만원 미만의 관리비가 나올 수 있어요.',
-      type: 'text',
-      placeholder: '예: 10만원 정도, 15~20만원',
+      question: '희망 관리비는 얼마정도인가요?',
+      description: '건물 관리를 위해 거주하는 동안 관리비가 부과돼요. 주택 유형에 따라 관리비가 다를 수 있으니, 집을 보기 전 사전에 어느 정도 예상하는 것이 좋아요.',
+      type: 'radioWithDescription',
+      options: [
+        { value: '5만원 미만', description: '평균적인 단독·다가구주택 관리비' },
+        { value: '5만원 ~ 10만원 미만', description: '평균적인 원룸·빌라 관리비' },
+        { value: '10만원 ~ 20만원 미만', description: '평균적인 오피스텔·소형 아파트 관리비' },
+        { value: '20만원 이상', description: '평균적인 아파트 관리비' }
+      ],
       section: '계약조건'
     },
     {
@@ -497,7 +502,7 @@ const RentalChecklist = () => {
     if (answers.pets?.hasPets === '예' && answers.pets?.needsClause === 'yes') {
       let petClause = '임차인은 반려동물을 동반하여 입주하며, 임대인은 이를 승낙함';
       if (answers.pets?.includeRepair) {
-        petClause += '. 임차인은 반려동물로 인한 도배, 장판의 교체가 필요할 경우 퇴거 시에 교체해주기로 함';
+        petClause += '. 단, 임차인은 반려동물에 의한 도배/장판 훼손 시 이를 교체하기로 함';
       }
       terms.push({
         title: '반려동물 동반 입주',
@@ -1849,20 +1854,30 @@ const RentalChecklist = () => {
                         <div className="text-sm text-gray-700">
                           ✓ 임차인은 반려동물을 동반하여 입주하며, 임대인은 이를 승낙함
                         </div>
-                        <label className="flex items-start gap-3 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={answers[currentQuestion.id]?.includeRepair || false}
-                            onChange={(e) => {
-                              const current = answers[currentQuestion.id];
-                              handleAnswer({ ...current, includeRepair: e.target.checked });
-                            }}
-                            className="mt-1 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                          />
-                          <span className="text-sm text-gray-700">
-                            임대인이 반려동물 입주를 거부하는 경우: 퇴거 시 도배/장판 교체 조건을 특약에 포함하기
-                          </span>
-                        </label>
+                        
+                        <div className="mt-4 pt-3 border-t border-indigo-200">
+                          <p className="text-xs text-rose-400 mb-3">
+                            💡 임대인이 반려동물 입주를 거부하는 경우, 하단의 특약을 제안하여 조율해볼 수 있습니다.
+                          </p>
+                          
+                          <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-indigo-100/50 transition">
+                            <input
+                              type="checkbox"
+                              checked={answers[currentQuestion.id]?.includeRepair || false}
+                              onChange={(e) => {
+                                const current = answers[currentQuestion.id];
+                                handleAnswer({ ...current, includeRepair: e.target.checked });
+                              }}
+                              className="mt-0.5 w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                            />
+                            <div className="flex-1">
+                              <span className="text-sm text-gray-700 font-medium block mb-1">특약에 포함하기</span>
+                              <span className="text-xs text-gray-600 leading-relaxed">
+                                임차인은 반려동물을 동반하여 입주하며, 임대인은 이를 승낙함. 단, 임차인은 반려동물에 의한 도배/장판 훼손 시 이를 교체하기로 한다.
+                              </span>
+                            </div>
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1914,6 +1929,22 @@ const RentalChecklist = () => {
                 }`}
               >
                 <span className="font-medium">{option}</span>
+              </button>
+            ))}
+
+            {/* 설명이 있는 라디오 (관리비용) */}
+            {currentQuestion.type === 'radioWithDescription' && currentQuestion.options.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => handleAnswer(option.value)}
+                className={`w-full p-4 rounded-lg border-2 transition text-left ${
+                  answers[currentQuestion.id] === option.value
+                    ? 'border-indigo-600 bg-indigo-50'
+                    : 'border-gray-200 hover:border-indigo-300'
+                }`}
+              >
+                <div className="font-semibold text-gray-800 mb-1">{option.value}</div>
+                <div className="text-sm text-rose-400">{option.description}</div>
               </button>
             ))}
 
