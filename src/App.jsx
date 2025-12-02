@@ -3,6 +3,8 @@ import { ChevronRight, ChevronLeft, Home, FileCheck, Download, Wind, Refrigerato
 
 const RentalChecklist = () => {
   const [showLanding, setShowLanding] = useState(true);
+  const [showCommunity, setShowCommunity] = useState(false);
+  const [showQuestionForm, setShowQuestionForm] = useState(false);
   const [showCostCalculator, setShowCostCalculator] = useState(false);
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -937,63 +939,260 @@ const RentalChecklist = () => {
             </div>
           </div>
           
-          {/* 하단 기능 버튼들 - 항상 수평 배치 */}
-          <div className="grid grid-cols-2 gap-6">
-            {/* 임대차계약 체크리스트 만들기 */}
+          {/* 하단 기능 버튼들 */}
+          <div className="space-y-6">
+            {/* 첫 번째 줄: 체크리스트와 비용 계산기 - 항상 가로 2개 */}
+            <div className="grid grid-cols-2 gap-4 md:gap-6">
+              {/* 임대차계약 체크리스트 만들기 */}
+              <button
+                onClick={() => setShowLanding(false)}
+                className="group bg-white rounded-2xl shadow-xl p-6 md:p-8 hover:shadow-2xl transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-indigo-500"
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 md:w-20 h-16 md:h-20 flex items-center justify-center mb-3 md:mb-4 group-hover:scale-110 transition-transform">
+                    <img 
+                      src="https://i.imgur.com/5ob0aSD.png" 
+                      alt="체크리스트 아이콘"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <h2 className="text-base md:text-2xl font-bold text-gray-800 leading-snug">
+                    체크리스트와<br />맞춤특약<br className="md:hidden" /><span className="hidden md:inline"><br /></span>만들기
+                  </h2>
+                </div>
+              </button>
+              
+              {/* 임대차계약 비용 계산기 */}
+              <button
+                onClick={() => {
+                  setShowLanding(false);
+                  setShowCostCalculator(true);
+                }}
+                className="group bg-white rounded-2xl shadow-xl p-6 md:p-8 hover:shadow-2xl transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-green-500"
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 md:w-20 h-16 md:h-20 flex items-center justify-center mb-3 md:mb-4 group-hover:scale-110 transition-transform">
+                    <img 
+                      src="https://i.imgur.com/g56IkAV.png" 
+                      alt="비용 계산기 아이콘"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <h2 className="text-base md:text-2xl font-bold text-gray-800 leading-snug">
+                    비용<br />계산하기
+                  </h2>
+                </div>
+              </button>
+            </div>
+
+            {/* 두 번째 줄: 커뮤니티 (중앙 정렬) */}
+            <div className="flex justify-center">
+              <button
+                onClick={() => {
+                  setShowLanding(false);
+                  setShowCommunity(true);
+                }}
+                className="group bg-white rounded-2xl shadow-xl p-6 md:p-8 hover:shadow-2xl transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-purple-500 w-full md:w-2/3"
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 md:w-20 h-16 md:h-20 flex items-center justify-center mb-3 md:mb-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-full h-full text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-base md:text-2xl font-bold text-gray-800 leading-snug">
+                    조건 공유하고<br />조언 받기
+                  </h2>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 커뮤니티 화면 (오픈채팅 vs 질문하기)
+  if (showCommunity && !showQuestionForm) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+        <div className="max-w-4xl w-full">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+              임대차 조언 받기
+            </h1>
+            <p className="text-gray-600">
+              전문가와 경험자들에게 조언을 받아보세요
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* 카카오톡 오픈채팅방 */}
             <button
-              onClick={() => setShowLanding(false)}
+              onClick={() => window.open('https://open.kakao.com/o/szyy9J4h', '_blank')}
+              className="group bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-yellow-500"
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className="w-20 h-20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <svg className="w-full h-full text-yellow-500" viewBox="0 0 24 24" fill="currentColor">
+                    {/* 카카오톡 말풍선 */}
+                    <path d="M12 3c5.799 0 10.5 3.664 10.5 8.185 0 4.52-4.701 8.184-10.5 8.184a13.5 13.5 0 0 1-1.727-.11l-4.408 2.883c-.501.265-.678.236-.472-.413l.892-3.678c-2.88-1.46-4.785-3.99-4.785-6.866C1.5 6.665 6.201 3 12 3z"/>
+                    {/* Kakao 텍스트 */}
+                    <text x="12" y="12" fontSize="4.5" fontWeight="bold" fill="white" textAnchor="middle" dominantBaseline="middle">Kakao</text>
+                  </svg>
+                </div>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
+                  Kakao<br />오픈채팅방 입장
+                </h2>
+                <p className="text-sm text-gray-600">
+                  실시간으로 대화하고<br />경험을 공유해보세요
+                </p>
+              </div>
+            </button>
+
+            {/* 질문 남기기 */}
+            <button
+              onClick={() => setShowQuestionForm(true)}
               className="group bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-indigo-500"
             >
               <div className="flex flex-col items-center text-center">
                 <div className="w-20 h-20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <img 
-                    src="https://i.imgur.com/5ob0aSD.png" 
-                    alt="체크리스트 아이콘"
-                    className="w-full h-full object-contain"
-                  />
+                  <svg className="w-full h-full text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
                 </div>
-                {/* 데스크톱 */}
-                <h2 className="hidden md:block text-2xl font-bold text-gray-800">
-                  임대차계약 체크리스트와<br />맞춤특약 만들기
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
+                  질문 남기기
                 </h2>
-                {/* 모바일 */}
-                <h2 className="block md:hidden text-lg font-bold text-gray-800 leading-relaxed">
-                  임대차계약<br />
-                  체크리스트와<br />
-                  맞춤특약<br />
-                  만들기
-                </h2>
+                <p className="text-sm text-gray-600">
+                  이메일로 질문을 남기면<br />답변을 드려요
+                </p>
               </div>
             </button>
-            
-            {/* 임대차계약 비용 계산기 */}
+          </div>
+
+          {/* 뒤로가기 버튼 */}
+          <div className="text-center">
             <button
               onClick={() => {
-                setShowLanding(false);
-                setShowCostCalculator(true);
+                setShowCommunity(false);
+                setShowLanding(true);
               }}
-              className="group bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-green-500"
+              className="px-6 py-3 bg-white rounded-lg shadow hover:shadow-lg transition font-medium text-gray-700"
             >
-              <div className="flex flex-col items-center text-center">
-                <div className="w-20 h-20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <img 
-                    src="https://i.imgur.com/g56IkAV.png" 
-                    alt="비용 계산기 아이콘"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                {/* 데스크톱 */}
-                <h2 className="hidden md:block text-2xl font-bold text-gray-800">
-                  임대차계약<br />비용 계산하기
-                </h2>
-                {/* 모바일 */}
-                <h2 className="block md:hidden text-lg font-bold text-gray-800 leading-relaxed">
-                  임대차계약<br />
-                  비용<br />
-                  계산하기
-                </h2>
-              </div>
+              ← 처음으로 돌아가기
             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 질문 폼 화면
+  if (showQuestionForm) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full">
+          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                질문 남기기
+              </h1>
+              <p className="text-gray-600">
+                임대차 계약 관련 질문을 남겨주세요. 답변을 이메일로 보내드립니다.
+              </p>
+            </div>
+
+            <form 
+              action="https://formsubmit.co/gazigazip@naver.com" 
+              method="POST"
+              className="space-y-6"
+            >
+              {/* FormSubmit 설정 */}
+              <input type="hidden" name="_subject" value="[부동산가기전에] 새로운 질문이 도착했습니다" />
+              <input type="hidden" name="_template" value="table" />
+              <input type="hidden" name="_captcha" value="false" />
+              
+              {/* 이름 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  이름 *
+                </label>
+                <input
+                  type="text"
+                  name="이름"
+                  required
+                  placeholder="홍길동"
+                  className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-600 focus:outline-none transition"
+                />
+              </div>
+
+              {/* 이메일 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  이메일 *
+                </label>
+                <input
+                  type="email"
+                  name="이메일"
+                  required
+                  placeholder="example@naver.com"
+                  className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-600 focus:outline-none transition"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  답변을 받으실 이메일 주소를 입력해주세요
+                </p>
+              </div>
+
+              {/* 질문 내용 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  질문 내용 *
+                </label>
+                <textarea
+                  name="질문내용"
+                  required
+                  rows="8"
+                  placeholder="임대차 계약과 관련하여 궁금한 점을 자세히 작성해주세요.&#10;&#10;예시:&#10;- 전세 계약 시 주의해야 할 점이 무엇인가요?&#10;- 중개수수료는 어떻게 계산되나요?&#10;- 특약에 어떤 내용을 넣어야 하나요?"
+                  className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-600 focus:outline-none transition resize-none"
+                />
+              </div>
+
+              {/* 파일 첨부 안내 */}
+              <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  📎 <strong>계약서나 사진 첨부가 필요하신가요?</strong><br />
+                  카카오톡 오픈채팅방에서 직접 파일을 공유해주시면 더 빠르고 정확한 답변을 드릴 수 있습니다!
+                </p>
+              </div>
+
+              {/* 버튼 그룹 */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="submit"
+                  className="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
+                >
+                  질문 보내기
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowQuestionForm(false);
+                    setShowCommunity(true);
+                  }}
+                  className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition"
+                >
+                  취소
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+              <p className="text-sm text-gray-700 leading-relaxed">
+                💡 <strong>안내:</strong> 질문을 남기시면 검토 후 이메일로 답변을 드립니다. 
+                실시간 답변이 필요하시다면 카카오톡 오픈채팅방을 이용해주세요.
+              </p>
+            </div>
           </div>
         </div>
       </div>
