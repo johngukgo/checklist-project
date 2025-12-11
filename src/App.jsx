@@ -233,7 +233,7 @@ const RentalChecklist = () => {
     {
       id: 'options',
       question: '필수 옵션을 모두 선택해주세요',
-      description: '계약 시 꼭 갖춰져 있어야 하는 항목을 선택해주세요.',
+      description: '계약 시 꼭 갖춰져 있어야 하는 항목을 선택해주세요. 주로 원룸, 오피스텔, 도시형 생활주택의 경우 옵션이 제공되는 경우가 많으며, 옵션이 꼭 필요한 상황이라면 이런 형태의 주택에 거주하는 것이 유리해요.',
       type: 'optionsWithIcons',
       options: [
         { name: '에어컨', icon: Wind },
@@ -268,14 +268,22 @@ const RentalChecklist = () => {
     {
       id: 'depositInsurance',
       question: '보증보험에 가입할 예정인가요?',
-      description: '보증보험 가입 시 임대인의 협조가 필요해요.',
+      description: '전세보증보험을 통해 퇴거 시 임대인에게 전세금을 반환받지 못하더라도, 보증보험사를 통해 우선적으로 반환받을 수 있어요. 보증보험 가입 시 임대인의 협조가 필요해요.',
       type: 'radio',
       options: ['예', '아니오'],
       section: '선택조건'
     },
     {
+      id: 'depositInsuranceConditions',
+      question: '보증보험 가입 조건을 확인해주세요',
+      description: '보증보험을 가입하기 위해서는 아래의 조건에 해당하는 집을 찾아야 해요.',
+      type: 'insuranceConditionsCheck',
+      condition: (ans) => ans.depositInsurance === '예',
+      section: '선택조건'
+    },
+    {
       id: 'additionalTerms',
-      question: '추가로 특약에 넣고 싶은 내용이 있나요?',
+      question: '추가로 특약에 넣거나 계약조건에 포함하고 싶은 내용이 있나요?',
       description: '위에서 다루지 않은 특별한 조건이 있다면 자유롭게 작성해주세요.',
       type: 'textWithNone',
       placeholder: '예: 공과금 분담, 주변 소음 관련 사항 등',
@@ -328,6 +336,11 @@ const RentalChecklist = () => {
   };
 
   const handleNext = () => {
+    // insuranceConditionsCheck 타입일 때 자동으로 confirmed 저장
+    if (currentQuestion?.type === 'insuranceConditionsCheck' && !answers[currentQuestion.id]) {
+      setAnswers({ ...answers, [currentQuestion.id]: 'confirmed' });
+    }
+    
     if (step < visibleQuestions.length - 1) {
       setStep(step + 1);
     } else {
@@ -978,7 +991,7 @@ const RentalChecklist = () => {
                     />
                   </div>
                   <h2 className="text-base md:text-2xl font-bold text-gray-800 leading-snug">
-                    비용<br />계산하기
+                    임대차계약<br />비용계산하기
                   </h2>
                 </div>
               </button>
@@ -994,7 +1007,7 @@ const RentalChecklist = () => {
                 className="group bg-white rounded-2xl shadow-xl p-6 md:p-8 hover:shadow-2xl transition-all transform hover:-translate-y-1 border-2 border-transparent hover:border-purple-500 w-full md:w-2/3"
               >
                 <div className="flex flex-col items-center text-center">
-                  <div className="w-32 md:w-40 h-32 md:h-40 flex items-center justify-center mb-0 group-hover:scale-110 transition-transform">
+                  <div className="w-32 md:w-40 h-32 md:h-40 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                     <img 
                       src="https://i.imgur.com/5IvI9d7.png" 
                       alt="Q&A 아이콘"
@@ -1077,6 +1090,7 @@ const RentalChecklist = () => {
       const answer = answers[q.id];
       if (!answer) return;
       if (q.id === 'additionalTerms') return;
+      if (q.id === 'depositInsuranceConditions') return; // 보증보험 조건 확인 항목 제외
 
       let label = q.question.replace(/을 입력해주세요|를 선택해주세요|을 선택해주세요|가 있나요\?|인가요\?|이 필요하신가요\?|을 키우시나요\?|을 받을 예정인가요\?|에 가입할 예정인가요\?/g, '');
       let displayValue = '';
@@ -1352,6 +1366,50 @@ const RentalChecklist = () => {
                     <p className="text-xs text-gray-700 leading-relaxed">"{term.content}"</p>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* 보증보험 가입 조건 섹션 */}
+          {answers.depositInsurance === '예' && (
+            <div className="mb-6 print:break-inside-avoid">
+              <h2 className="text-lg font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-500">
+                📋 보증보험 가입 조건
+              </h2>
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start">
+                    <span className="text-blue-600 mr-2 font-bold">•</span>
+                    <span>임대차기간이 1년 이상일 것</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-600 mr-2 font-bold">•</span>
+                    <span>보증금이 주택가격의 90% 이하일 것</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-600 mr-2 font-bold">•</span>
+                    <span>공인중개사를 통한 계약일 것</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-600 mr-2 font-bold">•</span>
+                    <span>아파트, 단독/다가구/다중주택, 주거용 오피스텔, 다세대주택, 도시형생활주택</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-600 mr-2 font-bold">•</span>
+                    <span>등기부등본상의 경매신청, 압류, 가압류, 가처분, 가등기 등 권리침해사항이 없으며, 선순위채권금액이 주택가액의 60% 이하일 것</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-600 mr-2 font-bold">•</span>
+                    <span>위반건축물이 아닐 것</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-600 mr-2 font-bold">•</span>
+                    <span>선순위채권과 임차인이 지급하는 전세보증금을 합한 금액이 주택가격의 90% 이하일 것</span>
+                  </li>
+                </ul>
+                <p className="text-xs text-gray-600 mt-3 italic">
+                  * 선순위채권: 다른 채권보다 먼저 변제받을 권리 (근저당권, 임대차보증금 등)
+                </p>
               </div>
             </div>
           )}
@@ -2000,6 +2058,62 @@ const RentalChecklist = () => {
               </div>
             )}
 
+            {/* 보증보험 가입 조건 안내 */}
+            {currentQuestion.type === 'insuranceConditionsCheck' && (
+              <div className="space-y-4">
+                <div className="p-6 bg-blue-50 rounded-lg border border-blue-200 space-y-3">
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-2">•</span>
+                      <span>임대차기간이 1년 이상일 것</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-2">•</span>
+                      <span>보증금이 주택가격의 90% 이하일 것</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-2">•</span>
+                      <span>공인중개사를 통한 계약일 것</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-2">•</span>
+                      <span>아파트, 단독/다가구/다중주택, 주거용 오피스텔, 다세대주택, 도시형생활주택</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-2">•</span>
+                      <span>등기부등본상의 경매신청, 압류, 가압류, 가처분, 가등기 등 권리침해사항이 없으며, <span className="relative group">
+                        <span className="text-red-600 font-medium cursor-help border-b border-red-300 border-dotted">선순위채권</span>
+                        <span className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg z-10">
+                          <strong>선순위채권이란?</strong><br />
+                          다른 채권보다 먼저 변제받을 권리. 근저당권, 임대차보증금 등이 여기에 해당해요.
+                        </span>
+                      </span>금액이 주택가액의 60% 이하일 것</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-2">•</span>
+                      <span>위반건축물이 아닐 것</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-blue-600 mr-2">•</span>
+                      <span><span className="relative group">
+                        <span className="text-red-600 font-medium cursor-help border-b border-red-300 border-dotted">선순위채권</span>
+                        <span className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg z-10">
+                          <strong>선순위채권이란?</strong><br />
+                          다른 채권보다 먼저 변제받을 권리. 근저당권, 임대차보증금 등이 여기에 해당해요.
+                        </span>
+                      </span>과 임차인이 지급하는 전세보증금을 합한 금액이 주택가격의 90% 이하일 것</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <p className="text-sm text-gray-700">
+                    ⚠️ 내가 지금 구하는 집이 위의 조건에 해당하지 않아 보증보험이 안 될 수 있는지 확인하는 게 필요해요.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* 일반 라디오 */}
             {currentQuestion.type === 'radio' && currentQuestion.options.map((option) => (
               <button
@@ -2065,7 +2179,8 @@ const RentalChecklist = () => {
           </button>
           <button
             onClick={handleNext}
-            disabled={!answers[currentQuestion.id] || 
+            disabled={
+              (currentQuestion.type !== 'insuranceConditionsCheck' && !answers[currentQuestion.id]) || 
               (currentQuestion.type === 'contractMultiple' && (!answers[currentQuestion.id]?.types || answers[currentQuestion.id].types.length === 0)) ||
               (currentQuestion.type === 'contractMultiple' && answers[currentQuestion.id]?.types?.includes('전세') && !answers[currentQuestion.id]?.jeonse) ||
               (currentQuestion.type === 'contractMultiple' && answers[currentQuestion.id]?.types?.includes('월세') && (!answers[currentQuestion.id]?.wolseDeposit || !answers[currentQuestion.id]?.wolseRent)) ||
@@ -2077,7 +2192,9 @@ const RentalChecklist = () => {
               (currentQuestion.type === 'petsWithDetails' && (!answers[currentQuestion.id]?.completed))}
             className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {step === visibleQuestions.length - 1 ? '결과 보기' : '다음'}
+            {currentQuestion.type === 'insuranceConditionsCheck' 
+              ? '확인했어요. 다음항목으로 이동' 
+              : (step === visibleQuestions.length - 1 ? '결과 보기' : '다음')}
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
